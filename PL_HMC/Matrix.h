@@ -159,7 +159,49 @@ public:
         }
         
         return det;
+    }
+    
+    void LU() {
+        std::array<std::complex<double>, dimensions * dimensions> tmpL;
+        std::array<std::complex<double>, dimensions * dimensions> tmpU;
         
+        for (int i = 0; i < dimensions; i++) {
+            for (int j = 0; j < dimensions; j++) {
+                if (j < i)
+                    tmpL[j * dimensions + i] = 0;
+                else {
+                    tmpL[j * dimensions + i] = elements[j * dimensions + i];
+                    for (int k = 0; k < i; k++) {
+                        tmpL[j * dimensions + i] = tmpL[j * dimensions + i] - tmpL[j * dimensions + k] * tmpU[k * dimensions + i];
+                    }
+                }
+            }
+            for (int j = 0; j < dimensions; j++) {
+                if (j < i)
+                    tmpU[i * dimensions + j] = 0;
+                else if (j == i)
+                    tmpU[i * dimensions + j] = 1;
+                else {
+                    tmpU[i * dimensions + j] = elements[i * dimensions + j] / tmpL[i * dimensions + i];
+                    for (int k = 0; k < i; k++) {
+                        tmpU[i * dimensions + j] = tmpU[i * dimensions + j] - ((tmpL[i * dimensions + k] * tmpU[k * dimensions + j]) / tmpL[i * dimensions  + i]);
+                    }
+                }
+            }
+        }
+        
+        matrix<dimensions> L(tmpL);
+        matrix<dimensions> U(tmpU);
+    }
+    
+    matrix<dimensions> transpose() {
+        std::array<std::complex<double>, dimensions * dimensions> tmp;
+        for (int i = 0; i < dimensions; i++) {
+            for (int j = 0; j < dimensions; j++) {
+                tmp[i * dimensions + j] = elements[j * dimensions + i];
+            }
+        }
+        return matrix<dimensions>(tmp);
     }
 };
 
@@ -213,45 +255,4 @@ matrix<dimensions> identity() {
         }
     }
     return matrix<dimensions>(elements);
-}
-
-template<size_t dimensions>
-std::complex<double> determinant(const matrix<dimensions> M) {
-    std::array<std::complex<double>, dimensions * dimensions> tmpL;
-    std::array<std::complex<double>, dimensions * dimensions> tmpU;
-    
-    for (int i = 0; i < dimensions; i++) {
-        for (int j = 0; j < dimensions; j++) {
-            if (j < i)
-                tmpL[j * dimensions + i] = 0;
-            else {
-                tmpL[j * dimensions + i] = M.get(j, i);
-                for (int k = 0; k < i; k++) {
-                    tmpL[j * dimensions + i] = tmpL[j * dimensions + i] - tmpL[j * dimensions + k] * tmpU[k * dimensions + i];
-                }
-            }
-        }
-        for (int j = 0; j < dimensions; j++) {
-            if (j < i)
-                tmpU[i * dimensions + j] = 0;
-            else if (j == i)
-                tmpU[i * dimensions + j] = 1;
-            else {
-                tmpU[i * dimensions + j] = M.get(i, j) / tmpL[i * dimensions + i];
-                for (int k = 0; k < i; k++) {
-                    tmpU[i * dimensions + j] = tmpU[i * dimensions + j] - ((tmpL[i * dimensions + k] * tmpU[k * dimensions + j]) / tmpL[i * dimensions  + i]);
-                }
-            }
-        }
-    }
-    
-    matrix<dimensions> L(tmpL);
-    matrix<dimensions> U(tmpU);
-    
-    std::complex<double> det = 1.;
-    for (int i = 0; i < dimensions; i++) {
-        det = det * L.get(i, i) * U.get(i, i);
-    }
-    
-    return det;
 }

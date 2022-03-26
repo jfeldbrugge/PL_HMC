@@ -28,6 +28,10 @@ public:
         return coords_[index];
     }
     
+    void assign(std::complex<double> v, size_t index) {
+        coords_[index] = v;
+    }
+    
     point& operator=(const point& a)
     {
         for(size_t i = 0; i < dimensions; ++i)

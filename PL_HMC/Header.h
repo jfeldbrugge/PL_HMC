@@ -61,3 +61,6 @@ double uniform() {
 
 template<size_t dimensions>
 void writeB(std::vector<point<dimensions>> xi, std::string fileName);
+
+template <size_t dimensions>
+std::complex<double> expectation(std::complex<double> (*OO)(point<dimensions>), const std::vector<point<dimensions>> &xi, const double tau, const int N_tau);

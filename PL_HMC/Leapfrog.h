@@ -25,9 +25,20 @@ std::tuple<point<dimensions>, double> leapfrog(const point<dimensions> x, const 
         P = P + force(X, tau, N_tau) * Delta_s / 2.;
         X = X + P * Delta_s / m;
         P = P + force(X, tau, N_tau) * Delta_s / 2.;
-        
-//        std::cout << "(X, P, H) = (" << X << ", " << P << ", " << Hamiltonian(X, P, m, tau, N_tau) << ")" << std::endl;
+    }
+    return {X, Hamiltonian(X, P, m, tau, N_tau)};
+}
+
+template <size_t dimensions>
+std::complex<double> expectation(std::complex<double> (*OO)(point<dimensions>), const std::vector<point<dimensions>> &xi, const double tau, const int N_tau) {
+    std::complex<double> numerator = 0., denominator = 0.;
+    for (int i = 0; i < xi.size(); i++) {
+        point<dimensions> z, f;
+        matrix<dimensions> J;
+        flow(xi[i], z, J, f, tau, N_tau);
+        numerator = numerator + OO(z) * std::exp(I * H(z)) * J.determinant();
+        denominator = denominator + std::exp(I * H(z)) * J.determinant();
     }
     
-    return {X, Hamiltonian(X, P, m, tau, N_tau)};
+    return numerator / denominator;
 }

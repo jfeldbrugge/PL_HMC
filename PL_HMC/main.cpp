@@ -9,6 +9,12 @@ template <size_t dimensions>
 std::complex<double> O(const point<dimensions> p) {
     return p.get(0) * p.get(0);
 }
+
+template <size_t dimensions>
+std::complex<double> O1(const point<dimensions> p) {
+    return p.get(0) * p.get(0) * p.get(0) * p.get(0);
+}
+
 int main(int argc, const char * argv[]) {
     // Parameters
     const int dimensions = 1;
@@ -18,8 +24,6 @@ int main(int argc, const char * argv[]) {
     const int N_s = 200;
     const int N_samples = 1000000;
     const double m = 1.;
-    
-    matrix<3> M({10., 1., 0., 2., 1., 3., 3., 1., 1.});
     
     std::srand(0);
     std::default_random_engine gen;
@@ -31,12 +35,13 @@ int main(int argc, const char * argv[]) {
     
     std::cout << "Picard-Lefschetz Hamiltonian Monte Carlo with " << N_samples << " samples" << std::endl;
     std::vector<point<dimensions>> xi(N_samples);
-    std::cout << "Progress:";
-    point<dimensions> x({0.1});
+    std::cout << "Progress:"; std::cout.flush();
+    point<dimensions> x;
     int count = 0;
     int reject = 0;
     while (count < N_samples) {
-        point<dimensions> p({normal(gen)});
+        point<dimensions> p;
+        for (int i = 0; i < dimensions; i++) p.assign(normal(gen), i);
         
         double H0 = Hamiltonian(x, p, m, tau, N_tau);
         auto [X, H1] = leapfrog(x, p, Delta_s, N_s, tau, N_tau, m);
@@ -60,15 +65,8 @@ int main(int argc, const char * argv[]) {
     // Evaluate the expectation value
     //
     
-    std::complex<double> numerator = 0., denominator = 0.;
-    for (int i = 0; i < xi.size(); i++) {
-        point<dimensions> z, f;
-        matrix<dimensions> J;
-        flow(xi[i], z, J, f, tau, N_tau);
-        numerator = numerator + O(z) * std::exp(I * H(z)) * determinant(J);
-        denominator = denominator + std::exp(I * H(z)) * determinant(J);
-    }
-    std::cout << "E[O(x)] = " << numerator / denominator << std::endl;
+    std::cout << "E[O(x)] = " << expectation(&O, xi, tau, N_tau) << std::endl;
+    std::cout << "E[O1(x)] = " << expectation(&O1, xi, tau, N_tau) << std::endl;
     
     std::cout << "Done!" << std::endl;
     return 0;
