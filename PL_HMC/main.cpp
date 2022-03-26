@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
             xi[count] = X;
             x = X;
             count++;
-            if ((count % (N_samples / 100) == 0)) {
+            if ((count % (N_samples / 10) == 0)) {
                 std::cout << "."; std::cout.flush();
             }
         } else {
@@ -53,7 +53,7 @@ int main(int argc, const char * argv[]) {
         }
     }
     std::cout << std::endl;
-    std::cout << "Rejection rate: " << double(reject) / double(N_samples) * 100. << "%" << std::endl;
+    std::cout << "Rejection rate: " << double(reject) / double(N_samples + reject) << std::endl;
     writeB(xi, "xi.bin");
     
     //
