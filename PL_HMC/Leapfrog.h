@@ -21,11 +21,15 @@ template <size_t dimensions>
 std::tuple<point<dimensions>, double> leapfrog(const point<dimensions> x, const point<dimensions> p,
               const double Delta_s, const int N_s, const double tau, const int N_tau, const double m) {
     point<dimensions> X = x, P = p;
+    
+    point<dimensions> F = force(X, tau, N_tau);
     for (int i = 1; i < N_s + 1; i++) {
-        P = P + force(X, tau, N_tau) * Delta_s / 2.;
+        P = P + F * Delta_s / 2.;
         X = X + P * Delta_s / m;
-        P = P + force(X, tau, N_tau) * Delta_s / 2.;
+        F = force(X, tau, N_tau);
+        P = P + F * Delta_s / 2.;
     }
+
     return {X, Hamiltonian(X, P, m, tau, N_tau)};
 }
 
