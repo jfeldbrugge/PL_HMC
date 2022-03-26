@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Job Feldbrugge" />
+  <title>Picard-Lefschetz Hamiltonian Monte Carlo</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel = "icon" href = "figures/icon.png" type = "image/x-icon">
+  <div class="topnav">
+  <a href="https://jfeldbrugge.github.io/">Home</a> <a href="https://jfeldbrugge.github.io/Projects-and-Codes/">Projects and Code</a>
+  </div>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Picard-Lefschetz Hamiltonian Monte Carlo</h1>
+<p class="author">Job Feldbrugge</p>
+</header>
+<p>We develop a Picard-Lefschetz Hamiltonian Monte Carlo following <a href="https://arxiv.org/abs/2112.10519">Fujisawa, Nishimura, Sakai, and Yosprakob (2022)</a>. The expectation value of the observable <span class="math inline">\(\mathcal{O}\)</span> with respect to the phase <span class="math inline">\(e^{iS}\)</span> with the action <span class="math inline">\(S\)</span> takes the form</p>
+<p><span class="math display">\[\langle \mathcal{O}(\boldsymbol{x}) \rangle =\frac{\int_{\mathbb{R}^N} \mathcal{O}(\boldsymbol{x}) e^{iS(\boldsymbol{x})}\mathrm{d}\boldsymbol{x}}{\int_{\mathbb{R}^N} e^{iS(\boldsymbol{x})}\mathrm{d}\boldsymbol{x}}.\]</span></p>
+<p>Unfortunately, these integrals are generally difficult to evaluate, as the result might depend on a delicate cancelation of terms due to the oscillations in <span class="math inline">\(e^{iS}\)</span>. We will here combine Hamiltonian Monte Carlo methods with Picard-Lefschetz theory to mitigate the oscillations and efficiently evaluate the expectation value.</p>
+<h2 id="picard-lefschetz-theory">Picard-Lefschetz theory</h2>
+<p>We extend the ‘action’ <span class="math inline">\(S\)</span> in the complex plane and consider the downward’s flow</p>
+<p><span class="math display">\[\frac{\partial z_k(\boldsymbol{x}, \sigma)}{\partial \sigma} = i\frac{\overline{\partial  S(\boldsymbol{z}(\boldsymbol{x},\sigma))}}{\partial z_k}\]</span></p>
+<p>with respect to the <span class="math inline">\(h\)</span>-function <span class="math inline">\(h(\boldsymbol{z}) = \text{Re}[i S(\boldsymbol{z})]\)</span>. Along the deformed manifold <span class="math inline">\(M_\tau = \{\boldsymbol{z}(\boldsymbol{x}, \tau)|\boldsymbol{x} \in \mathbb{R}^N\}\)</span> for fixed <span class="math inline">\(\tau\)</span>, the expectation value takes the form</p>
+<p><span class="math display">\[\langle \mathcal{O}(\boldsymbol{x})\rangle = \frac{\int_{\mathbb{R}^N} \mathcal{O}(\boldsymbol{x})e^{iS(\boldsymbol{z}(\boldsymbol{x},\tau))} \text{det} (J(\boldsymbol{x},\tau))\mathrm{d}\boldsymbol{x}}{\int_{\mathbb{R}^N} e^{iS(\boldsymbol{z}(\boldsymbol{x},\tau))} \text{det} (J(\boldsymbol{x},\tau))\mathrm{d}\boldsymbol{x}},\]</span></p>
+<p>with the Jacobian matrix</p>
+<p><span class="math display">\[J_{kl}(\boldsymbol{x},\sigma) = \frac{\partial z_k(\boldsymbol{x},\sigma)}{\partial x_l}.\]</span></p>
+<p>For the one-dimensional example with <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span>, the deformed manifold can be visualized in the complex plane <span class="math inline">\(\mathbb{C}\)</span>.</p>
+<figure>
+<a href='figures/Manifold.png'><img src='figures/Manifold.png' width=50% /></a>
+<figcaption>
+Fig. 1 - The manifold <span class="math inline">\(M_\tau\)</span> for the action <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span> for <span class="math inline">\(\tau=0.05,0.1,0.2\)</span> (red, blue, and green). The black curves are the steepest descent curves of the three saddle points at <span class="math inline">\(x=-1,0,\)</span> and <span class="math inline">\(1\)</span>.
+</figcaption>
+</figure>
+<p>This integral is better behaved on <span class="math inline">\(M_\tau\)</span>, as the integrand vanishes away from the relevant saddle points of the ‘action’.</p>
+<figure>
+<table align="left" width="100%" id="FIG">
+<tr>
+<td>
+<img src='figures/Int_0.png' width=100% />
+</td>
+<td>
+<img src='figures/Int_1.png' width=100% />
+</td>
+</tr>
+</table>
+<figcaption>
+Fig. 2 - The real (red), imaginary (blue), and absolute value (black) of the phase <span class="math inline">\(e^{iS(\boldsymbol{z}(\boldsymbol{x},\tau))}\)</span> with <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span> as a function of <span class="math inline">\(x\)</span>. In the left panel, we display the original integration domain <span class="math inline">\(\tau=0\)</span>. In the right panel, we work on the deformed domain <span class="math inline">\(M_\tau\)</span> with <span class="math inline">\(\tau=0.1\)</span>.
+</figcaption>
+</figure>
+<p>It can in particular be evaluated using Hamiltonian Monte Carlo methods.</p>
+<h2 id="hamiltonian-monte-carlo-sampling">Hamiltonian Monte Carlo sampling</h2>
+<p>To efficiently sample the parameter space, we introduce the Hamiltonian</p>
+<p><span class="math display">\[H(\boldsymbol{x},\boldsymbol{p})= \frac{1}{2}\boldsymbol{p}^TM^{-1}\boldsymbol{p} - h(\boldsymbol{z}(\boldsymbol{x},\tau))\]</span></p>
+<p>with the auxiliary momentum <span class="math inline">\(\boldsymbol{p}\)</span> conjugate to <span class="math inline">\(\boldsymbol{x}\)</span> and the symmetric positive definite mass matrix <span class="math inline">\(M\)</span>. The Hamiltonian equation take the form</p>
+<p><span class="math display">\[
+\begin{align}
+\frac{\mathrm{d} \boldsymbol{x}}{\mathrm{d}s} &amp;= M^{-1}\boldsymbol{p}(s),\\
+\frac{\mathrm{d} \boldsymbol{p}}{\mathrm{d}s} &amp;= \boldsymbol{F}(s),
+\end{align}
+\]</span></p>
+<p>with the force</p>
+<p><span class="math display">\[
+\begin{align}
+\boldsymbol{F}(s) &amp;= \nabla_{\boldsymbol{x}} h(\boldsymbol{z}(\boldsymbol{x},\tau))|_{\boldsymbol{x}=\boldsymbol{x}(s)}\\
+&amp;= \text{Re}[\boldsymbol{f}(s) J(\boldsymbol{x}(s),\tau)],
+\end{align}
+\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol{f}\)</span> is the gradient of the exponent</p>
+<p><span class="math display">\[
+\boldsymbol{f}(s) = i \nabla_{\boldsymbol{z}} S(\boldsymbol{z})|_{\boldsymbol{z} = \boldsymbol{z}(\boldsymbol{x}(s),\tau)}.
+\]</span></p>
+<p>See for example the force for the one-dimensional action <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span>.</p>
+<figure>
+<a href='figures/Force.png'><img src='figures/Force.png' width=50% /></a>
+<figcaption>
+Fig. 3 - The force <span class="math inline">\(F\)</span> as a function of <span class="math inline">\(x\)</span> for the action <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span> for the flow time <span class="math inline">\(\tau=0.1\)</span>.
+</figcaption>
+</figure>
+<p>Starting from an initial point <span class="math inline">\(\boldsymbol{X}_0\)</span> and an initial momentum <span class="math inline">\(\boldsymbol{P}_0\)</span> sampled from the multi-dimensional Gaussian distribution <span class="math inline">\(\mathcal{N}(\boldsymbol{0},M)\)</span>, we evaluate the Hamiltonian flow for a time <span class="math inline">\(s_f\)</span>. At this time, we evaluate the Hamiltonian to obtain the fluctuation</p>
+<p><span class="math display">\[\delta H = H(\boldsymbol{x}(s_f), \boldsymbol{p}(s_f)) - H(\boldsymbol{x}(0), \boldsymbol{p}(0)).\]</span></p>
+<p>We accept this sample <span class="math inline">\(\boldsymbol{x}(s_f)\)</span> with probability <span class="math inline">\(\text{min}(1, e^{-\delta H})\)</span>. If we accept the sample, we repeat these steps from the new initial position <span class="math inline">\(\boldsymbol{X}_1=\boldsymbol{x}(s_f)\)</span>. If we decline the sample, repeat the step from the original position <span class="math inline">\(\boldsymbol{X}_0\)</span>. Using this method, we obtain an ensable of points <span class="math inline">\((\boldsymbol{X}_1,\boldsymbol{X}_2,\dots,\boldsymbol{X}_{N_{samples}})\)</span> sampling the distribution with the probability density</p>
+<p><span class="math display">\[p(\boldsymbol{x}) \propto e^{h(\boldsymbol{z}(\boldsymbol{x},\tau ))}.\]</span></p>
+<p>The expectation value can be estimated as</p>
+<p><span class="math display">\[\langle \mathcal{O}(\boldsymbol{x}) \rangle = \frac{\sum_{s=1}^{N_{samples}} \mathcal{O}(\boldsymbol{X}_s)J(\boldsymbol{X}_s,\tau) e^{i H(\boldsymbol{z}(\boldsymbol{X}_s,\tau))}}{\sum_{s=1}^{N_{samples}} J(\boldsymbol{X}_s,\tau) e^{i H(\boldsymbol{z}(\boldsymbol{X}_s,\tau))}}.\]</span></p>
+<h2 id="discretization">Discretization</h2>
+<p>We descretize the flow using difference equations. We write the flow-time in terms of the steps <span class="math inline">\(\sigma_n= n \epsilon\)</span> with <span class="math inline">\(n=0,1,2,\dots,N_\tau\)</span> and <span class="math inline">\(\tau = N_\tau \epsilon\)</span>. We approximate the flow using the equation</p>
+<p><span class="math display">\[z_k(\boldsymbol{x},\sigma_{n+1}) = z_k(\boldsymbol{x},\sigma_n)  + i\epsilon \frac{\overline{\partial  S(\boldsymbol{z}(\boldsymbol{x},\sigma_n))}}{\partial z_k}\]</span></p>
+<p>with the boundary condition <span class="math inline">\(z_k(\boldsymbol{x},\sigma_{0})=\boldsymbol{x}\)</span>. The Jacobian satisfies the equation</p>
+<p><span class="math display">\[J_{kl}(\boldsymbol{x}, \sigma_{n+1}) = J_{kl}(\boldsymbol{x},\sigma_n) + i \epsilon \overline{ H_{km}(\boldsymbol{z}(\boldsymbol{x},\sigma_n)) J_{ml}(\boldsymbol{x},\sigma_n)}\]</span></p>
+<p>with the Hessian <span class="math inline">\(H_{ij}(\boldsymbol{z}) = \frac{\partial^2 S(\boldsymbol{z})}{\partial z_i \partial z_j}\)</span> and the boundary condition <span class="math inline">\(J_{kl}(\boldsymbol{x}, \sigma_{0}) = I_N\)</span> with <span class="math inline">\(I_N\)</span> the <span class="math inline">\(N\times N\)</span> identity matrix.</p>
+<p>Starting from a normally distributed initial momentum <span class="math inline">\(\boldsymbol{p}_0\)</span>, we solve the Hamiltonian system with a leapfrog kick-drift-kick routine <span class="math display">\[
+\begin{align}
+\boldsymbol{p}_{i + 1/2} &amp;= \boldsymbol{p}_{i} + \frac{\Delta s}{2} \boldsymbol{F}_i,\\
+\boldsymbol{x}_{i+1}   &amp;= \boldsymbol{x}_{i} + \Delta s M^{-1}\boldsymbol{p}_{i+1/2} ,\\
+\boldsymbol{p}_{i+1} &amp;= \boldsymbol{p}_{i+1/2} + \frac{\Delta s}{2} \boldsymbol{F}_{i+1},
+\end{align}
+\]</span></p>
+<p>for <span class="math inline">\(i=0,1,\dots, N_s\)</span> with <span class="math inline">\(N_s \Delta s = s_f\)</span> where we define the force <span class="math inline">\(\boldsymbol{F}_i = \text{Re}[\boldsymbol{f}(\boldsymbol{x}_i, \tau) J(\boldsymbol{x}_i,\tau)]\)</span> with <span class="math inline">\(J(\boldsymbol{x}_i,\tau)\)</span> the Jacobian matrix and <span class="math inline">\(\boldsymbol{f}(\boldsymbol{x}_i, \tau)\)</span> is obtained using the backpropagation scheme <span class="math display">\[
+f_j(\boldsymbol{x}, \sigma_n) = f_j(\boldsymbol{x}, \sigma_{n-1}) -i \epsilon \overline{f_i(\boldsymbol{x},\sigma_{n-1})}H_{ij}(\boldsymbol{z}(\boldsymbol{x},\sigma_{N_\tau - n})),
+\]</span> with the boundary condition <span class="math inline">\(f_j(\sigma_0) = i \nabla S(\boldsymbol{x})\)</span>. We accept the sample <span class="math inline">\(\boldsymbol{x}(s_f)\)</span> with probability <span class="math inline">\(\text{min}(1, e^{-\delta H})\)</span> with the change in Hamiltonian</p>
+<p><span class="math display">\[\delta H = H(\boldsymbol{x}_{N_s}, \boldsymbol{p}_{N_s}) - H(\boldsymbol{x}_0, \boldsymbol{p}_0).\]</span></p>
+<p>For the one-dimensional example with the action <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span> we see that we sample the appropriate distribution.</p>
+<figure>
+<a href='figures/Histogram.png'><img src='figures/Histogram.png' width=75% /></a>
+<figcaption>
+Fig. 4 - The distribution of samples as a function of <span class="math inline">\(x\)</span> for the action <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span> for the flow time <span class="math inline">\(\tau=0.1\)</span>.
+</figcaption>
+</figure>
+<h2 id="implementation">Implementation</h2>
+</body>
+</html>
