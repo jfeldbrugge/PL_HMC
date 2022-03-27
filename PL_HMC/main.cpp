@@ -27,7 +27,7 @@ int main(int argc, const char * argv[]) {
     const double m = 1.;
     matrix<dimensions> M;
     M = M.identity() * m;
-    matrix<dimensions> Minv = M.inverse();
+    matrix<dimensions> M_inv = M.inverse(), M_Cholesky = M.Cholesky();
     
     std::srand(0);
     std::default_random_engine gen;
@@ -47,10 +47,10 @@ int main(int argc, const char * argv[]) {
     while (count < N_samples) {
         point<dimensions> p;
         for (int i = 0; i < dimensions; i++) p.assign(normal(gen), i);
-        p = M.Cholesky() * p;
+        p = M_Cholesky * p;
         
-        double H0 = hamiltonian(x, p, Minv, tau, N_tau);
-        auto [X, H1] = leapfrog(x, p, Delta_s, N_s, tau, N_tau, Minv);
+        double H0 = hamiltonian(x, p, M_inv, tau, N_tau);
+        auto [X, H1] = leapfrog(x, p, Delta_s, N_s, tau, N_tau, M_inv);
         double delta_H = H1 - H0;
         if(uniform() < std::min(1., std::exp(- delta_H))) {
             xi[count] = X;
