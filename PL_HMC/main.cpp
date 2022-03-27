@@ -16,6 +16,7 @@ std::complex<double> O1(const point<dimensions> p) {
 }
 
 int main(int argc, const char * argv[]) {
+    
     // Parameters
     const int dimensions = 1;
     const int N_tau = 10;
@@ -24,16 +25,20 @@ int main(int argc, const char * argv[]) {
     const int N_s = 200;
     const int N_samples = 1000000;
     const double m = 1.;
+    matrix<dimensions> M;
+    M = M.identity() * m;
+    matrix<dimensions> Minv = M.inverse();
     
     std::srand(0);
     std::default_random_engine gen;
-    std::normal_distribution<double> normal(0., m);
+    std::normal_distribution<double> normal(0., 1);
+    
+    std::cout << "Picard-Lefschetz Hamiltonian Monte Carlo with " << N_samples << " samples" << std::endl;
     
     //
     // Sample the points
     //
     
-    std::cout << "Picard-Lefschetz Hamiltonian Monte Carlo with " << N_samples << " samples" << std::endl;
     std::vector<point<dimensions>> xi(N_samples);
     std::cout << "Progress:"; std::cout.flush();
     point<dimensions> x;
@@ -42,9 +47,10 @@ int main(int argc, const char * argv[]) {
     while (count < N_samples) {
         point<dimensions> p;
         for (int i = 0; i < dimensions; i++) p.assign(normal(gen), i);
+        p = M.Cholesky() * p;
         
-        double H0 = hamiltonian(x, p, m, tau, N_tau);
-        auto [X, H1] = leapfrog(x, p, Delta_s, N_s, tau, N_tau, m);
+        double H0 = hamiltonian(x, p, Minv, tau, N_tau);
+        auto [X, H1] = leapfrog(x, p, Delta_s, N_s, tau, N_tau, Minv);
         double delta_H = H1 - H0;
         if(uniform() < std::min(1., std::exp(- delta_H))) {
             xi[count] = X;
@@ -58,7 +64,8 @@ int main(int argc, const char * argv[]) {
         }
     }
     std::cout << std::endl;
-    std::cout << "Rejection rate: " << double(reject) / double(N_samples + reject) << std::endl;
+    std::cout << "Acceptance/Rejection rate: " << double(N_samples) / double(N_samples + reject) << "/" <<
+                                                 double(reject) / double(N_samples + reject) << std::endl;
     writeB(xi, "xi.bin");
     
     //

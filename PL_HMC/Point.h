@@ -81,6 +81,16 @@ public:
         return point(tmp);
     }
     
+    std::complex<double> operator*(const point &a) const
+    {
+        std::complex<double> sum = 0.;
+        for(size_t i = 0; i < dimensions; ++i)
+        {
+            sum = sum +  a.get(i) * coords_[i];
+        }
+        return sum;
+    }
+    
     point operator/(const std::complex<double> &a) const
     {
         std::array<std::complex<double>, dimensions> tmp;
