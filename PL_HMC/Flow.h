@@ -14,19 +14,19 @@ void flow(const point<dimensions> x,
     
     zi[0] = x;
     for (int i = 1; i < N_tau + 1; i++) {
-        zi[i] = zi[i - 1] + GradS(zi[i - 1]).conjugate() * I * eps;
+        zi[i] = zi[i - 1] + gradS(zi[i - 1]).conjugate() * I * eps;
     }
     z = zi[N_tau];
     
     Ji[0] = identity<dimensions>();
     for (int i = 1; i < N_tau + 1; i++) {
-        Ji[i] = Ji[i - 1] + HS(zi[i - 1]).conjugate() * Ji[i - 1].conjugate() * I * eps;
+        Ji[i] = Ji[i - 1] + hessS(zi[i - 1]).conjugate() * Ji[i - 1].conjugate() * I * eps;
     }
     J = Ji[N_tau];
     
-    fi[0] = GradS(x) * I;
+    fi[0] = gradS(x) * I;
     for (int i = 1; i < N_tau + 1; i++) {
-        fi[i] = fi[i - 1] - multiply(fi[i - 1].conjugate(), HS(zi[N_tau - i])) * I * eps;
+        fi[i] = fi[i - 1] - multiply(fi[i - 1].conjugate(), hessS(zi[N_tau - i])) * I * eps;
     }
     f = fi[N_tau];
     

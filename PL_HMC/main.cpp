@@ -43,7 +43,7 @@ int main(int argc, const char * argv[]) {
         point<dimensions> p;
         for (int i = 0; i < dimensions; i++) p.assign(normal(gen), i);
         
-        double H0 = Hamiltonian(x, p, m, tau, N_tau);
+        double H0 = hamiltonian(x, p, m, tau, N_tau);
         auto [X, H1] = leapfrog(x, p, Delta_s, N_s, tau, N_tau, m);
         double delta_H = H1 - H0;
         if(uniform() < std::min(1., std::exp(- delta_H))) {

@@ -1,5 +1,5 @@
 template <size_t dimensions>
-point<dimensions> GradS(const point<dimensions> p)
+point<dimensions> gradS(const point<dimensions> p)
 {
     const double eps = 0.000001;
     std::array<std::complex<double>, dimensions> grad;
@@ -15,7 +15,7 @@ point<dimensions> GradS(const point<dimensions> p)
 }
 
 template <size_t dimensions>
-matrix<dimensions> HS(const point<dimensions> p)
+matrix<dimensions> hessS(const point<dimensions> p)
 {
     const double eps = 0.0001;
     std::array<std::complex<double>, dimensions * dimensions> hessian;

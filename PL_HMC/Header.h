@@ -27,13 +27,19 @@ template <size_t dimensions>
 std::complex<double> S(const point<dimensions> p);
 
 template <size_t dimensions>
-double Hamiltonian(point<dimensions> z, point<dimensions> p, const double m);
+double h(const point<dimensions> p);
 
 template <size_t dimensions>
-point<dimensions> GradS(const point<dimensions> p);
+double H(const point<dimensions> p);
 
 template <size_t dimensions>
-matrix<dimensions> HS(const point<dimensions> p);
+double hamiltonian(point<dimensions> z, point<dimensions> p, const double m);
+
+template <size_t dimensions>
+point<dimensions> gradS(const point<dimensions> p);
+
+template <size_t dimensions>
+matrix<dimensions> hessS(const point<dimensions> p);
 
 template <size_t dimensions>
 void flow(const point<dimensions> x,
@@ -48,12 +54,6 @@ point<dimensions> force(const point<dimensions> x, const double tau, const int N
 template <size_t dimensions>
 std::tuple<point<dimensions>, double> leapfrog(const point<dimensions> x, const point<dimensions> p,
                                                const double Delta_s, const int N_s, const double tau, const int N_tau, const double m);
-
-template <size_t dimensions>
-double h(const point<dimensions> p);
-
-template <size_t dimensions>
-double H(const point<dimensions> p);
 
 double uniform() {
     return (double) rand() / RAND_MAX;
