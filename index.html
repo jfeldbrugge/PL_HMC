@@ -31,10 +31,10 @@
 </header>
 <p>We develop a Picard-Lefschetz Hamiltonian Monte Carlo following <a href="https://arxiv.org/abs/2112.10519">Fujisawa, Nishimura, Sakai, and Yosprakob (2022)</a>. The expectation value of the observable <span class="math inline">\(\mathcal{O}\)</span> with respect to the phase <span class="math inline">\(e^{iS}\)</span> with the action <span class="math inline">\(S\)</span> takes the form</p>
 <p><span class="math display">\[\langle \mathcal{O}(\boldsymbol{x}) \rangle =\frac{\int_{\mathbb{R}^N} \mathcal{O}(\boldsymbol{x}) e^{iS(\boldsymbol{x})}\mathrm{d}\boldsymbol{x}}{\int_{\mathbb{R}^N} e^{iS(\boldsymbol{x})}\mathrm{d}\boldsymbol{x}}.\]</span></p>
-<p>Unfortunately, these integrals are generally difficult to evaluate, as the result might depend on a delicate cancelation of terms due to the oscillations in <span class="math inline">\(e^{iS}\)</span>. We will here combine Hamiltonian Monte Carlo methods with Picard-Lefschetz theory to mitigate the oscillations and efficiently evaluate the expectation value.</p>
+<p>Unfortunately, these integrals are generally difficult to evaluate, as the result might depend on a delicate cancellation of terms due to the oscillations in <span class="math inline">\(e^{iS}\)</span>. We will here combine Hamiltonian Monte Carlo methods with Picard-Lefschetz theory to mitigate the oscillations and efficiently evaluate the expectation value.</p>
 <h2 id="picard-lefschetz-theory">Picard-Lefschetz theory</h2>
 <p>We extend the ‘action’ <span class="math inline">\(S\)</span> in the complex plane and consider the downward’s flow</p>
-<p><span class="math display">\[\frac{\partial z_k(\boldsymbol{x}, \sigma)}{\partial \sigma} = i\frac{\overline{\partial  S(\boldsymbol{z}(\boldsymbol{x},\sigma))}}{\partial z_k}\]</span></p>
+<p><span class="math display">\[\frac{\partial z_k(\boldsymbol{x}, \sigma)}{\partial \sigma} = i\frac{\overline{\partial S(\boldsymbol{z}(\boldsymbol{x},\sigma))}}{\partial z_k}\]</span></p>
 <p>with respect to the <span class="math inline">\(h\)</span>-function <span class="math inline">\(h(\boldsymbol{z}) = \text{Re}[i S(\boldsymbol{z})]\)</span>. Along the deformed manifold <span class="math inline">\(M_\tau = \{\boldsymbol{z}(\boldsymbol{x}, \tau)|\boldsymbol{x} \in \mathbb{R}^N\}\)</span> for fixed <span class="math inline">\(\tau\)</span>, the expectation value takes the form</p>
 <p><span class="math display">\[\langle \mathcal{O}(\boldsymbol{x})\rangle = \frac{\int_{\mathbb{R}^N} \mathcal{O}(\boldsymbol{x})e^{iS(\boldsymbol{z}(\boldsymbol{x},\tau))} \text{det} (J(\boldsymbol{x},\tau))\mathrm{d}\boldsymbol{x}}{\int_{\mathbb{R}^N} e^{iS(\boldsymbol{z}(\boldsymbol{x},\tau))} \text{det} (J(\boldsymbol{x},\tau))\mathrm{d}\boldsymbol{x}},\]</span></p>
 <p>with the Jacobian matrix</p>
@@ -66,7 +66,7 @@ Fig. 2 - The real (red), imaginary (blue), and absolute value (black) of the pha
 <h2 id="hamiltonian-monte-carlo-sampling">Hamiltonian Monte Carlo sampling</h2>
 <p>To efficiently sample the parameter space, we introduce the Hamiltonian</p>
 <p><span class="math display">\[H(\boldsymbol{x},\boldsymbol{p})= \frac{1}{2}\boldsymbol{p}^TM^{-1}\boldsymbol{p} - h(\boldsymbol{z}(\boldsymbol{x},\tau))\]</span></p>
-<p>with the auxiliary momentum <span class="math inline">\(\boldsymbol{p}\)</span> conjugate to <span class="math inline">\(\boldsymbol{x}\)</span> and the symmetric positive definite mass matrix <span class="math inline">\(M\)</span>. The Hamiltonian equation take the form</p>
+<p>with the auxiliary momentum <span class="math inline">\(\boldsymbol{p}\)</span> conjugate to <span class="math inline">\(\boldsymbol{x}\)</span> and the symmetric positive definite mass matrix <span class="math inline">\(M\)</span>. The Hamiltonian equations take the form</p>
 <p><span class="math display">\[
 \begin{align}
 \frac{\mathrm{d} \boldsymbol{x}}{\mathrm{d}s} &amp;= M^{-1}\boldsymbol{p}(s),\\
@@ -96,17 +96,18 @@ Fig. 3 - The force <span class="math inline">\(F\)</span> as a function of <span
 <p>We accept this sample <span class="math inline">\(\boldsymbol{x}(s_f)\)</span> with probability <span class="math inline">\(\text{min}(1, e^{-\delta H})\)</span>. If we accept the sample, we repeat these steps from the new initial position <span class="math inline">\(\boldsymbol{X}_1=\boldsymbol{x}(s_f)\)</span>. If we decline the sample, repeat the step from the original position <span class="math inline">\(\boldsymbol{X}_0\)</span>. Using this method, we obtain an ensable of points <span class="math inline">\((\boldsymbol{X}_1,\boldsymbol{X}_2,\dots,\boldsymbol{X}_{N_{samples}})\)</span> sampling the distribution with the probability density</p>
 <p><span class="math display">\[p(\boldsymbol{x}) \propto e^{h(\boldsymbol{z}(\boldsymbol{x},\tau ))}.\]</span></p>
 <p>The expectation value can be estimated as</p>
-<p><span class="math display">\[\langle \mathcal{O}(\boldsymbol{x}) \rangle = \frac{\sum_{s=1}^{N_{samples}} \mathcal{O}(\boldsymbol{X}_s)J(\boldsymbol{X}_s,\tau) e^{i H(\boldsymbol{z}(\boldsymbol{X}_s,\tau))}}{\sum_{s=1}^{N_{samples}} J(\boldsymbol{X}_s,\tau) e^{i H(\boldsymbol{z}(\boldsymbol{X}_s,\tau))}}.\]</span></p>
+<p><span class="math display">\[\langle \mathcal{O}(\boldsymbol{x}) \rangle = \frac{\sum_{s=1}^{N_{samples}} \mathcal{O}(\boldsymbol{X}_s)J(\boldsymbol{X}_s,\tau) e^{i H(\boldsymbol{z}(\boldsymbol{X}_s,\tau))}}{\sum_{s=1}^{N_{samples}} J(\boldsymbol{X}_s,\tau) e^{i H(\boldsymbol{z}(\boldsymbol{X}_s,\tau))}},\]</span></p>
+<p>with <span class="math inline">\(H(\boldsymbol{z}) = \text{Im}(iS(\boldsymbol{z}))\)</span>.</p>
 <h2 id="discretization">Discretization</h2>
 <p>We descretize the flow using difference equations. We write the flow-time in terms of the steps <span class="math inline">\(\sigma_n= n \epsilon\)</span> with <span class="math inline">\(n=0,1,2,\dots,N_\tau\)</span> and <span class="math inline">\(\tau = N_\tau \epsilon\)</span>. We approximate the flow using the equation</p>
-<p><span class="math display">\[z_k(\boldsymbol{x},\sigma_{n+1}) = z_k(\boldsymbol{x},\sigma_n)  + i\epsilon \frac{\overline{\partial  S(\boldsymbol{z}(\boldsymbol{x},\sigma_n))}}{\partial z_k}\]</span></p>
+<p><span class="math display">\[z_k(\boldsymbol{x},\sigma_{n+1}) = z_k(\boldsymbol{x},\sigma_n) + i\epsilon \frac{\overline{\partial S(\boldsymbol{z}(\boldsymbol{x},\sigma_n))}}{\partial z_k}\]</span></p>
 <p>with the boundary condition <span class="math inline">\(z_k(\boldsymbol{x},\sigma_{0})=\boldsymbol{x}\)</span>. The Jacobian satisfies the equation</p>
 <p><span class="math display">\[J_{kl}(\boldsymbol{x}, \sigma_{n+1}) = J_{kl}(\boldsymbol{x},\sigma_n) + i \epsilon \overline{ H_{km}(\boldsymbol{z}(\boldsymbol{x},\sigma_n)) J_{ml}(\boldsymbol{x},\sigma_n)}\]</span></p>
 <p>with the Hessian <span class="math inline">\(H_{ij}(\boldsymbol{z}) = \frac{\partial^2 S(\boldsymbol{z})}{\partial z_i \partial z_j}\)</span> and the boundary condition <span class="math inline">\(J_{kl}(\boldsymbol{x}, \sigma_{0}) = I_N\)</span> with <span class="math inline">\(I_N\)</span> the <span class="math inline">\(N\times N\)</span> identity matrix.</p>
 <p>Starting from a normally distributed initial momentum <span class="math inline">\(\boldsymbol{p}_0\)</span>, we solve the Hamiltonian system with a leapfrog kick-drift-kick routine <span class="math display">\[
 \begin{align}
 \boldsymbol{p}_{i + 1/2} &amp;= \boldsymbol{p}_{i} + \frac{\Delta s}{2} \boldsymbol{F}_i,\\
-\boldsymbol{x}_{i+1}   &amp;= \boldsymbol{x}_{i} + \Delta s M^{-1}\boldsymbol{p}_{i+1/2} ,\\
+\boldsymbol{x}_{i+1}  &amp;= \boldsymbol{x}_{i} + \Delta s M^{-1}\boldsymbol{p}_{i+1/2} ,\\
 \boldsymbol{p}_{i+1} &amp;= \boldsymbol{p}_{i+1/2} + \frac{\Delta s}{2} \boldsymbol{F}_{i+1},
 \end{align}
 \]</span></p>
