@@ -24,7 +24,7 @@ int main(int argc, const char * argv[]) {
     const double Delta_s = 0.02;
     const int N_s = 200;
     const int N_samples = 1000000;
-    const double m = 1.;
+    const double m = 0.5;
     matrix<dimensions> M;
     M = M.identity() * m;
     matrix<dimensions> M_inv = M.inverse(), M_Cholesky = M.Cholesky();
