@@ -1,14 +1,14 @@
 template <size_t dimensions>
-double hamiltonian(point<dimensions> z, point<dimensions> p, const matrix<dimensions> Minv) {
-    return std::real(Minv * p * p / 2.) - h(z);
+double hamiltonian(point<dimensions> z, point<dimensions> p, const matrix<dimensions> M_inv) {
+    return std::real(M_inv * p * p / 2.) - h(z);
 }
 
 template <size_t dimensions>
-double hamiltonian(point<dimensions> x, point<dimensions> p, const matrix<dimensions> Minv, const double tau, const int N_tau) {
+double hamiltonian(point<dimensions> x, point<dimensions> p, const matrix<dimensions> M_inv, const double tau, const int N_tau) {
     point<dimensions> z, f;
     matrix<dimensions> J;
     flow(x, z, J, f, tau, N_tau);
-    return hamiltonian(z, p, Minv);
+    return hamiltonian(z, p, M_inv);
 }
     
 template <size_t dimensions>

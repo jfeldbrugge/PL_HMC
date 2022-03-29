@@ -24,7 +24,7 @@ int main(int argc, const char * argv[]) {
     const double Delta_s = 0.02;
     const int N_s = 200;
     const int N_samples = 1000000;
-    const double m = 0.5;
+    const double m = 2.;
     matrix<dimensions> M;
     M = M.identity() * m;
     matrix<dimensions> M_inv = M.inverse(), M_Cholesky = M.Cholesky();
@@ -65,7 +65,7 @@ int main(int argc, const char * argv[]) {
     }
     std::cout << std::endl;
     std::cout << "Acceptance/Rejection rate: " << double(N_samples) / double(N_samples + reject) << "/" <<
-                                                 double(reject) / double(N_samples + reject) << std::endl;
+                                                  double(reject) / double(N_samples + reject)    << std::endl;
     writeB(xi, "xi.bin");
     
     //
