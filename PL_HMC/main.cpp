@@ -5,7 +5,7 @@ std::complex<double> S(const point<dimensions> p) {
     if (dimensions == 1) {
         return (p.get(0) - 1.) * (p.get(0) - 1.) * (p.get(0) + 1.) * (p.get(0) + 1.);
     } else {
-        return (p.get(0) - 1.) * (p.get(0) - 1.) * (p.get(0) + 1.) * (p.get(0) + 1.) + p.get(0) * p.get(1);
+        return (p.get(0) - 1.) * (p.get(0) - 1.) * (p.get(0) + 1.) * (p.get(0) + 1.) + p.get(1) * p.get(1);
     }
 }
 
