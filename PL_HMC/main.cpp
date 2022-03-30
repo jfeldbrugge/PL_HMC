@@ -30,7 +30,7 @@ int main(int argc, const char * argv[]) {
     const double tau = 0.1;
     const double Delta_s = 0.02;
     const int N_s = 200;
-    const int N_samples = 1000000;
+    const int N_samples = 100000;
     const double m = 2.;
 
     matrix<dimensions> M = identity<dimensions>() * m;
