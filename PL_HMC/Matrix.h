@@ -4,41 +4,20 @@ class matrix
 private:
     std::array<std::complex<double>, dimensions * dimensions> elements;
 public:
-    matrix()
-    {
-        for(int i = 0; i < dimensions * dimensions; i++)
-        {
+    matrix() {
+        for(int i = 0; i < dimensions * dimensions; i++) {
             elements[i] = 0;
         }
     }
     
-    matrix(std::array<std::complex<double>, dimensions * dimensions> c) : elements(c)
-    {
-    }
+    matrix(std::array<std::complex<double>, dimensions * dimensions> c) : elements(c) {}
     
-    matrix(std::initializer_list<std::complex<double>> list)
-    {
+    matrix(std::initializer_list<std::complex<double>> list) {
         size_t n = std::min(dimensions * dimensions, list.size());
         std::copy_n(list.begin(), n, elements.begin());
     }
     
-    matrix identity() {
-        for(size_t i = 0; i < dimensions; ++i)
-        {
-            for(size_t j = 0; j < dimensions; ++j)
-            {
-                if(i == j) {
-                    elements[i * dimensions + j] = 1.;
-                } else {
-                    elements[i * dimensions + j] = 0.;
-                }
-            }
-        }
-        return *this;
-    }
-    
-    std::complex<double> get(size_t index1, size_t index2) const
-    {
+    std::complex<double> get(size_t index1, size_t index2) const {
         return elements[index1 * dimensions + index2];
     }
     
@@ -46,66 +25,52 @@ public:
         elements[index1 * dimensions + index2] = v;
     }
     
-    matrix& operator=(const matrix& a)
-    {
-        for(size_t i = 0; i < dimensions; ++i)
-        {
-            for(size_t j = 0; j < dimensions; ++j)
-            {
+    matrix& operator=(const matrix& a) {
+        for(size_t i = 0; i < dimensions; ++i) {
+            for(size_t j = 0; j < dimensions; ++j) {
                 elements[i * dimensions + j] = a.get(i, j);
             }
         }
         return *this;
     }
     
-    matrix operator+(const matrix& a) const
-    {
+    matrix operator+(const matrix& a) const {
         std::array<std::complex<double>, dimensions * dimensions> tmp;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
-            for(size_t j = 0; j < dimensions; ++j)
-            {
+        for(size_t i = 0; i < dimensions; ++i) {
+            for(size_t j = 0; j < dimensions; ++j) {
                 tmp[i * dimensions + j] = elements[i * dimensions + j] + a.get(i, j);
             }
         }
         return matrix(tmp);
     }
     
-    matrix operator-(const matrix& a) const
-    {
+    matrix operator-(const matrix& a) const {
         std::array<std::complex<double>, dimensions * dimensions> tmp;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
-            for(size_t j = 0; j < dimensions; ++j)
-            {
+        for(size_t i = 0; i < dimensions; ++i) {
+            for(size_t j = 0; j < dimensions; ++j) {
                 tmp[i * dimensions + j] = elements[i * dimensions + j] - a.get(i, j);
             }
         }
         return matrix(tmp);
     }
     
-    matrix operator*(const double &a) const
-    {
+    matrix operator*(const double &a) const {
         std::array<std::complex<double>, dimensions * dimensions> tmp;
-        for(size_t i = 0; i < dimensions * dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions * dimensions; ++i) {
             tmp[i] = a * elements[i];
         }
         return matrix(tmp);
     }
     
-    matrix operator*(const std::complex<double> &a) const
-    {
+    matrix operator*(const std::complex<double> &a) const {
         std::array<std::complex<double>, dimensions * dimensions> tmp;
-        for(size_t i = 0; i < dimensions * dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions * dimensions; ++i) {
             tmp[i] = a * elements[i];
         }
         return matrix(tmp);
     }
     
-    matrix operator*(const matrix& M) const
-    {
+    matrix operator*(const matrix& M) const {
         std::array<std::complex<double>, dimensions * dimensions> tmp;
         for(size_t i = 0; i < dimensions; ++i) {
             for(size_t j = 0; j < dimensions; ++j) {
@@ -116,12 +81,10 @@ public:
                 tmp[i * dimensions + j] = sum;
             }
         }
-
         return matrix(tmp);
     }
     
-    point<dimensions> operator*(const point<dimensions>& b) const
-    {
+    point<dimensions> operator*(const point<dimensions>& b) const {
         std::array<std::complex<double>, dimensions> tmp;
         for(size_t i = 0; i < dimensions; ++i) {
             std::complex<double> sum = 0;
@@ -234,14 +197,11 @@ public:
 };
 
 template<size_t dimensions>
-std::ostream& operator<<(std::ostream& out, const matrix<dimensions>& m)
-{
+std::ostream& operator<<(std::ostream& out, const matrix<dimensions>& m) {
     out << '[';
-    for (size_t i = 0; i < dimensions; ++i)
-    {
+    for (size_t i = 0; i < dimensions; ++i) {
         out << '(';
-        for (size_t j = 0; j < dimensions; ++j)
-        {
+        for (size_t j = 0; j < dimensions; ++j) {
             if (j > 0)
                 out << ",";
             out << m.get(i, j);
@@ -255,8 +215,7 @@ std::ostream& operator<<(std::ostream& out, const matrix<dimensions>& m)
 }
 
 template<size_t dimensions>
-point<dimensions> multiply(const point<dimensions> v, const matrix<dimensions> M)
-{
+point<dimensions> multiply(const point<dimensions> v, const matrix<dimensions> M) {
     std::array<std::complex<double>, dimensions> tmp;
     for (int i = 0; i < dimensions; i++) {
         std::complex<double> sum = 0;
@@ -271,10 +230,8 @@ point<dimensions> multiply(const point<dimensions> v, const matrix<dimensions> M
 template<size_t dimensions>
 matrix<dimensions> identity() {
     std::array<std::complex<double>, dimensions * dimensions> elements;
-    for(size_t i = 0; i < dimensions; ++i)
-    {
-        for(size_t j = 0; j < dimensions; ++j)
-        {
+    for(size_t i = 0; i < dimensions; ++i) {
+        for(size_t j = 0; j < dimensions; ++j) {
             if(i == j) {
                 elements[i * dimensions + j] = 1.;
             } else {

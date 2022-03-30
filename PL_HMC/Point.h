@@ -5,26 +5,20 @@ private:
     std::array<std::complex<double>, dimensions> coords_;
     
 public:
-    point()
-    {
-        for(int i = 0; i < dimensions; i++)
-        {
+    point() {
+        for(int i = 0; i < dimensions; i++) {
             coords_[i] = 0;
         }
     }
     
-    point(std::array<std::complex<double>, dimensions> c) : coords_(c)
-    {
-    }
+    point(std::array<std::complex<double>, dimensions> c) : coords_(c) {}
     
-    point(std::initializer_list<std::complex<double>> list)
-    {
+    point(std::initializer_list<std::complex<double>> list) {
         size_t n = std::min(dimensions, list.size());
         std::copy_n(list.begin(), n, coords_.begin());
     }
     
-    std::complex<double> get(size_t index) const
-    {
+    std::complex<double> get(size_t index) const {
         return coords_[index];
     }
     
@@ -32,80 +26,74 @@ public:
         coords_[index] = v;
     }
     
-    point& operator=(const point& a)
-    {
-        for(size_t i = 0; i < dimensions; ++i)
-        {
+    point& operator=(const point& a) {
+        for(size_t i = 0; i < dimensions; ++i) {
             coords_[i] = a.get(i);
         }
         return *this;
     }
 
-    point operator+(const point& a) const
-    {
+    point operator+(const point& a) const {
         std::array<std::complex<double>, dimensions> tmp;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions; ++i) {
             tmp[i] = coords_[i] + a.get(i);
         }
         return point(tmp);
     }
     
-    point operator-(const point& a) const
-    {
+    point operator-(const point& a) const {
         std::array<std::complex<double>, dimensions> tmp;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions; ++i) {
             tmp[i] = coords_[i] - a.get(i);
         }
         return point(tmp);
     }
 
-    point operator*(const double &a) const
-    {
+    point operator*(const double &a) const {
         std::array<std::complex<double>, dimensions> tmp;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions; ++i) {
             tmp[i] = a * coords_[i];
         }
         return point(tmp);
     }
     
-    point operator*(const std::complex<double> &a) const
-    {
+    point operator*(const std::complex<double> &a) const {
         std::array<std::complex<double>, dimensions> tmp;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions; ++i) {
             tmp[i] = a * coords_[i];
         }
         return point(tmp);
     }
     
-    std::complex<double> operator*(const point &a) const
-    {
+    std::complex<double> operator*(const point &a) const {
         std::complex<double> sum = 0.;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions; ++i) {
             sum = sum +  a.get(i) * coords_[i];
         }
         return sum;
     }
     
-    point operator/(const std::complex<double> &a) const
-    {
+//    point operator*(const matrix<dimensions> &A) const {
+//        std::array<std::complex<double>, dimensions> tmp;
+//        for(size_t i = 0; i < dimensions; ++i) {
+//            for(size_t j = 0; i < dimensions; ++i) {
+//                tmp[i] = coords_[j] * A.get(j, i);
+//            }
+//        }
+//        return point(tmp);
+//    }
+    
+    point operator/(const std::complex<double> &a) const {
         std::array<std::complex<double>, dimensions> tmp;
-        for(size_t i = 0; i < dimensions; ++i)
-        {
+        for(size_t i = 0; i < dimensions; ++i) {
             tmp[i] = coords_[i] / a;
         }
         return point(tmp);
     }
     
-    bool operator==(const point& a) const
-    {
+    bool operator==(const point& a) const {
         bool equal = true;
-        for (size_t i = 0; i < dimensions; ++i)
-        {
+        for (size_t i = 0; i < dimensions; ++i) {
             equal = equal && get(i) == a.get(i);
         }
         return equal;
@@ -113,8 +101,7 @@ public:
     
     point conjugate() {
         std::array<std::complex<double>, dimensions> tmp;
-        for (size_t i = 0; i < dimensions; ++i)
-        {
+        for (size_t i = 0; i < dimensions; ++i) {
             tmp[i] = std::conj(coords_[i]);
         }
         return point(tmp);
@@ -122,8 +109,7 @@ public:
     
     point re() {
         std::array<std::complex<double>, dimensions> tmp;
-        for (size_t i = 0; i < dimensions; ++i)
-        {
+        for (size_t i = 0; i < dimensions; ++i) {
             tmp[i] = std::real(coords_[i]);
         }
         return point(tmp);
@@ -131,8 +117,7 @@ public:
     
     point im() {
         std::array<std::complex<double>, dimensions> tmp;
-        for (size_t i = 0; i < dimensions; ++i)
-        {
+        for (size_t i = 0; i < dimensions; ++i) {
             tmp[i] = std::imag(coords_[i]);
         }
         return point(tmp);
@@ -140,11 +125,9 @@ public:
 };
 
 template<size_t dimensions>
-std::ostream& operator<<(std::ostream& out, const point<dimensions>& pt)
-{
+std::ostream& operator<<(std::ostream& out, const point<dimensions>& pt) {
     out << '(';
-    for (size_t i = 0; i < dimensions; ++i)
-    {
+    for (size_t i = 0; i < dimensions; ++i) {
         if (i > 0)
             out << ",";
         out << pt.get(i);
@@ -154,13 +137,10 @@ std::ostream& operator<<(std::ostream& out, const point<dimensions>& pt)
 }
 
 template<size_t dimensions>
-double norm(const point<dimensions> &pt)
-{
+double norm(const point<dimensions> &pt) {
     double norm = 0;
-    for(size_t i = 0; i < dimensions; ++i)
-    {
+    for(size_t i = 0; i < dimensions; ++i) {
         norm = norm + std::real(pt.get(i) * std::conj(pt.get(i)));
     }
     return sqrt(norm);
 }
-

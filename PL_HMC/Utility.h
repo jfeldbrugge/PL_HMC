@@ -11,6 +11,5 @@ void writeB(std::vector<point<dimensions>> xi, std::string fileName) {
     } else {
         std::cout << "Could not open " << fileName << std::endl;
     }
-    
     file.close();
 }
