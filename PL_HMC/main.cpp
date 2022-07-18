@@ -25,12 +25,12 @@ int main(int argc, const char * argv[]) {
     // Parameters
     //
     
-    const int dimensions = 2;
+    const int dimensions = 1;
     const int N_tau = 10;
     const double tau = 0.1;
     const double Delta_s = 0.02;
     const int N_s = 200;
-    const int N_samples = 100000;
+    const int N_samples = 1000000;
     const double m = 2.;
 
     matrix<dimensions> M = identity<dimensions>() * m;
@@ -55,11 +55,11 @@ int main(int argc, const char * argv[]) {
         point<dimensions> p;
         for (int i = 0; i < dimensions; i++) p.assign(normal(gen), i);
         p = M_Cholesky * p;
-        
+
         double H0 = hamiltonian(x, p, M_inv, tau, N_tau);
         auto [X, H1] = leapfrog(x, p, Delta_s, N_s, tau, N_tau, M_inv);
         double delta_H = H1 - H0;
-        
+
         if(!std::isnan(std::real(X.get(0))) && (std::real(X * X.conjugate()) < 1000) && (uniform() < std::min(1., std::exp(- delta_H)))) {
             xi[count] = X;
             x = X;
@@ -82,8 +82,8 @@ int main(int argc, const char * argv[]) {
     
     std::complex<double> mean = expectation(&O, xi, tau, N_tau);
     std::complex<double> var = variance(&O, mean, xi, tau, N_tau);
-    
-    std::cout << "E[O(x)] = " << mean << " +/- " << std::sqrt(var) / std::sqrt(double(N_samples)) << std::endl;
+
+    std::cout << "E[O(x)] = " << mean << " +/- " << std::real(std::sqrt(var)) / std::sqrt(double(N_samples)) << std::endl;
     
     std::cout << "Done!" << std::endl;
     return 0;

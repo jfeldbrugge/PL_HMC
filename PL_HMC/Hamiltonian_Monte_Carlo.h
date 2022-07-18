@@ -48,16 +48,30 @@ matrix<dimensions> hessS(const point<dimensions> p) {
 }
 
 template <size_t dimensions>
-void flow(const point<dimensions> x,
-          point<dimensions> &z,
-          matrix<dimensions> &J,
-          point<dimensions> &f,
-          const double tau, const int N_tau) {
+void flow(const point<dimensions> x, point<dimensions> &z, const double tau, const int N_tau) {
     std::complex<double> eps = tau / N_tau;
  
     std::vector<point<dimensions>> zi(N_tau + 1);
     std::vector<matrix<dimensions>> Ji(N_tau + 1);
     std::vector<point<dimensions>> fi(N_tau + 1);
+    
+    zi[0] = x;
+    for (int i = 1; i < N_tau + 1; i++) {
+        zi[i] = zi[i - 1] + gradS(zi[i - 1]).conjugate() * I * eps;
+    }
+    z = zi[N_tau];
+    
+//    for (int i = 0; i < zi.size(); i++) {
+//        std::cout << "zi[" << i << "] = " << zi[i] << std::endl;
+//    }
+}
+
+template <size_t dimensions>
+void flow(const point<dimensions> x, point<dimensions> &z, matrix<dimensions> &J, const double tau, const int N_tau) {
+    std::complex<double> eps = tau / N_tau;
+ 
+    std::vector<point<dimensions>> zi(N_tau + 1);
+    std::vector<matrix<dimensions>> Ji(N_tau + 1);
     
     zi[0] = x;
     for (int i = 1; i < N_tau + 1; i++) {
@@ -71,12 +85,6 @@ void flow(const point<dimensions> x,
     }
     J = Ji[N_tau];
     
-    fi[0] = gradS(x) * I;
-    for (int i = 1; i < N_tau + 1; i++) {
-        fi[i] = fi[i - 1] - multiply(fi[i - 1].conjugate(), hessS(zi[N_tau - i])) * I * eps;
-    }
-    f = fi[N_tau];
-    
 //    for (int i = 0; i < zi.size(); i++) {
 //        std::cout << "zi[" << i << "] = " << zi[i] << std::endl;
 //    }
@@ -85,18 +93,26 @@ void flow(const point<dimensions> x,
 //        std::cout << "J[" << i << "] = " << Ji[i] << std::endl;
 //    }
 //    std::cout << std::endl;
-//    for (int i = 0; i < Ji.size(); i++) {
-//        std::cout << "f[" << i << "] = " << fi[i] << std::endl;
-//    }
 }
 
 template <size_t dimensions>
 point<dimensions> force(const point<dimensions> x, const double tau, const int N_tau) {
-    point<dimensions> z, f;
-    matrix<dimensions> J;
+    std::complex<double> eps = tau / N_tau;
+ 
+    std::vector<point<dimensions>> zi(N_tau + 1);
+    std::vector<point<dimensions>> fi(N_tau + 1);
     
-    flow(x, z, J, f, tau, N_tau);
-    return multiply(f, J).re();
+    zi[0] = x;
+    for (int i = 1; i < N_tau + 1; i++) {
+        zi[i] = zi[i - 1] + gradS(zi[i - 1]).conjugate() * I * eps;
+    }
+    
+    fi[N_tau] = (gradS(zi.back()) * I).re();
+    for (int i = N_tau - 1; i >= 0; i--) {
+        fi[i] = fi[i + 1] - multiply(fi[i + 1].conjugate(), hessS(zi[i])) * I * eps;
+    }
+
+    return fi[0].re() * 2;
 }
 
 template <size_t dimensions>
@@ -107,8 +123,7 @@ double hamiltonian(point<dimensions> z, point<dimensions> p, const matrix<dimens
 template <size_t dimensions>
 double hamiltonian(point<dimensions> x, point<dimensions> p, const matrix<dimensions> M_inv, const double tau, const int N_tau) {
     point<dimensions> z, f;
-    matrix<dimensions> J;
-    flow(x, z, J, f, tau, N_tau);
+    flow(x, z, tau, N_tau);
     return hamiltonian(z, p, M_inv);
 }
     
@@ -134,9 +149,9 @@ std::complex<double> expectation(std::complex<double> (*OO)(point<dimensions>),
                                  const std::vector<point<dimensions>> &xi, const double tau, const int N_tau) {
     std::complex<double> numerator = 0., denominator = 0.;
     for (int i = 0; i < xi.size(); i++) {
-        point<dimensions> z, f;
+        point<dimensions> z;
         matrix<dimensions> J;
-        flow(xi[i], z, J, f, tau, N_tau);
+        flow(xi[i], z, J, tau, N_tau);
         numerator   = numerator   + OO(z) * std::exp(I * H(z)) * J.determinant();
         denominator = denominator +         std::exp(I * H(z)) * J.determinant();
     }
@@ -150,7 +165,7 @@ std::complex<double> variance(std::complex<double> (*OO)(point<dimensions>), con
     for (int i = 0; i < xi.size(); i++) {
         point<dimensions> z, f;
         matrix<dimensions> J;
-        flow(xi[i], z, J, f, tau, N_tau);
+        flow(xi[i], z, J, tau, N_tau);
         numerator   = numerator   + (OO(z) - exp) * std::conj(OO(z) - exp) * std::exp(I * H(z)) * J.determinant();
         denominator = denominator +                                          std::exp(I * H(z)) * J.determinant();
     }

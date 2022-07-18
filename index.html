@@ -76,13 +76,8 @@ Fig. 2 - The real (red), imaginary (blue), and absolute value (black) of the pha
 <p>with the force</p>
 <p><span class="math display">\[
 \begin{align}
-\boldsymbol{F}(s) &amp;= \nabla_{\boldsymbol{x}} h(\boldsymbol{z}(\boldsymbol{x},\tau))|_{\boldsymbol{x}=\boldsymbol{x}(s)}\\
-&amp;= \text{Re}[\boldsymbol{f}(s) J(\boldsymbol{x}(s),\tau)],
+\boldsymbol{F}(s) &amp;= \nabla_{\boldsymbol{x}} h(\boldsymbol{z}(\boldsymbol{x},\tau))|_{\boldsymbol{x}=\boldsymbol{x}(s)}.
 \end{align}
-\]</span></p>
-<p>where <span class="math inline">\(\boldsymbol{f}\)</span> is the gradient of the exponent</p>
-<p><span class="math display">\[
-\boldsymbol{f}(s) = i \nabla_{\boldsymbol{z}} S(\boldsymbol{z})|_{\boldsymbol{z} = \boldsymbol{z}(\boldsymbol{x}(s),\tau)}.
 \]</span></p>
 <p>See for example the force for the one-dimensional action <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span>.</p>
 <figure>
@@ -111,10 +106,10 @@ Fig. 3 - The force <span class="math inline">\(F\)</span> as a function of <span
 \boldsymbol{p}_{i+1} &amp;= \boldsymbol{p}_{i+1/2} + \frac{\Delta s}{2} \boldsymbol{F}_{i+1},
 \end{align}
 \]</span></p>
-<p>for <span class="math inline">\(i=0,1,\dots, N_s\)</span> with <span class="math inline">\(N_s \Delta s = s_f\)</span> where we define the force <span class="math inline">\(\boldsymbol{F}_i = \text{Re}[\boldsymbol{f}(\boldsymbol{x}_i, \tau) J(\boldsymbol{x}_i,\tau)]\)</span> with <span class="math inline">\(J(\boldsymbol{x}_i,\tau)\)</span> the Jacobian matrix and <span class="math inline">\(\boldsymbol{f}(\boldsymbol{x}_i, \tau)\)</span> is obtained using the backpropagation scheme <span class="math display">\[
-f_j(\boldsymbol{x}, \sigma_n) = f_j(\boldsymbol{x}, \sigma_{n-1}) -i \epsilon \overline{f_i(\boldsymbol{x},\sigma_{n-1})}H_{ij}(\boldsymbol{z}(\boldsymbol{x},\sigma_{N_\tau - n})),
-\]</span> with the boundary condition <span class="math inline">\(f_j(\sigma_0) = i \nabla S(\boldsymbol{x})\)</span>. We accept the sample <span class="math inline">\(\boldsymbol{x}(s_f)\)</span> with probability <span class="math inline">\(\text{min}(1, e^{-\delta H})\)</span> with the change in Hamiltonian</p>
-<p><span class="math display">\[\delta H = H(\boldsymbol{x}_{N_s}, \boldsymbol{p}_{N_s}) - H(\boldsymbol{x}_0, \boldsymbol{p}_0).\]</span></p>
+<p>for <span class="math inline">\(i=0,1,\dots, N_s\)</span> with <span class="math inline">\(N_s \Delta s = s_f\)</span> where we define the force <span class="math inline">\(\boldsymbol{F}_i = 2\  \text{Re}[\boldsymbol{f}(\boldsymbol{x}_i, \sigma_0) ]\)</span> with <span class="math inline">\(\boldsymbol{f}(\boldsymbol{x}_i, \sigma_0)\)</span> obtained using the backpropagation scheme <span class="math display">\[
+f_j(\boldsymbol{x}, \sigma_{n-1}) = f_j(\boldsymbol{x}, \sigma_{n}) -i \epsilon \overline{f_i(\boldsymbol{x},\sigma_{n})}H_{ij}(\boldsymbol{z}(\boldsymbol{x},\sigma_{n - 1})),
+\]</span> with the boundary condition <span class="math inline">\(f_j(\boldsymbol{x},\tau) = \text{Re}[ i \nabla S(\boldsymbol{z}(\boldsymbol{x}, \tau))]\)</span>. We accept the sample <span class="math inline">\(\boldsymbol{x}(s_f)\)</span> with probability <span class="math inline">\(\text{min}(1, e^{-\Delta H})\)</span> with the change in the Hamiltonian</p>
+<p><span class="math display">\[\Delta H = H(\boldsymbol{x}_{N_s}, \boldsymbol{p}_{N_s}) - H(\boldsymbol{x}_0, \boldsymbol{p}_0).\]</span></p>
 <p>For the one-dimensional example with the action <span class="math inline">\(S(x)=(x-1)^2(x+1)^2\)</span> we see that we sample the appropriate distribution.</p>
 <figure>
 <a href='figures/Histogram.png'><img src='figures/Histogram.png' width=75% /></a>
