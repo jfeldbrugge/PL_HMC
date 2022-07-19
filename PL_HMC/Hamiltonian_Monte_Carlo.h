@@ -48,6 +48,43 @@ matrix<dimensions> hessS(const point<dimensions> p) {
 }
 
 template <size_t dimensions>
+matrix<2 * dimensions> Lp(const point<dimensions> p, const std::complex<double> EPS) {
+    const double eps = 0.0001;
+    std::array<std::complex<double>, 4 * dimensions * dimensions> hessian;
+    for (int i = 0; i < 2 * dimensions; i++) {
+        for (int j = 0; j < 2 * dimensions; j++) {
+            
+            if (i == j) {
+                std::array<std::complex<double>, dimensions> temp;
+                if ((i % 2) == 0) {
+                    temp[i / 2] = eps;
+                } else {
+                    temp[(i - 1) / 2] = I * eps;
+                }
+                point<dimensions> Peps(temp);
+                hessian[i * 2 * dimensions + j] = 1. - std::real(EPS * I * (S(p + Peps) -2. * S(p) + S(p - Peps)) / (eps * eps));
+                
+            } else {
+                std::array<std::complex<double>, dimensions> temp1, temp2;
+                if ((i % 2) == 0) {
+                    temp1[i / 2] = eps;
+                } else {
+                    temp1[(i - 1) / 2] = I * eps;
+                }
+                if ((j % 2) == 0) {
+                    temp2[j / 2] = eps;
+                } else {
+                    temp2[(j - 1) / 2] = I * eps;
+                }
+                point<dimensions> Peps1(temp1), Peps2(temp2);
+                hessian[i * 2 * dimensions + j] = - std::real(EPS * I * (S(p + Peps1 + Peps2) - S(p + Peps1 - Peps2) - S(p - Peps1 + Peps2) + S(p - Peps1 - Peps2)) / (4. * eps * eps));
+            }
+        }
+    }
+    return matrix<2 * dimensions>(hessian);
+}
+
+template <size_t dimensions>
 void flow(const point<dimensions> x, point<dimensions> &z, const double tau, const int N_tau) {
     std::complex<double> eps = tau / N_tau;
  
@@ -100,19 +137,56 @@ point<dimensions> force(const point<dimensions> x, const double tau, const int N
     std::complex<double> eps = tau / N_tau;
  
     std::vector<point<dimensions>> zi(N_tau + 1);
-    std::vector<point<dimensions>> fi(N_tau + 1);
+    std::vector<point<2 * dimensions>> fi(N_tau + 1);
+    
+//    const double epss = 0.00000000001;
+//    zi[0] = x + point<dimensions>({epss});
+//    for (int i = 1; i < N_tau + 1; i++) {
+//        zi[i] = zi[i - 1] + gradS(zi[i - 1]).conjugate() * I * eps;
+//    }
+//    point<dimensions> zp = zi.back();
+//
+//    zi[0] = x - point<dimensions>({epss});
+//    for (int i = 1; i < N_tau + 1; i++) {
+//        zi[i] = zi[i - 1] + gradS(zi[i - 1]).conjugate() * I * eps;
+//    }
+//    point<dimensions> zm = zi.back();
+//
+//    return point<dimensions>({h(zp) - h(zm) / (2. * epss)});
+    
     
     zi[0] = x;
     for (int i = 1; i < N_tau + 1; i++) {
         zi[i] = zi[i - 1] + gradS(zi[i - 1]).conjugate() * I * eps;
     }
+
+    point<dimensions> fInit = (gradS(zi.back()) * I).conjugate();
+    std::array<std::complex<double>, 2 * dimensions> tmp;
+    for (int i = 0; i < dimensions; i++) {
+        tmp[2 * i] = std::real(fInit.get(i));
+        tmp[2 * i + 1] = std::imag(fInit.get(i));
+    }
     
-    fi[N_tau] = (gradS(zi.back()) * I).re();
+    fi[N_tau] = point<2 * dimensions>(tmp);
     for (int i = N_tau - 1; i >= 0; i--) {
-        fi[i] = fi[i + 1] - multiply(fi[i + 1].conjugate(), hessS(zi[i])) * I * eps;
+        fi[i] = multiply(fi[i + 1], Lp(zi[i], eps));
+    }
+    
+    std::vector<point<dimensions>> ff(N_tau + 1);
+    for (int i = 0; i < ff.size(); i++) {
+        std::array<std::complex<double>, dimensions> tmp;
+        for (int j = 0; j < dimensions; j++) {
+            tmp[j] = fi[i].get(2 * j) + fi[i].get(2 * j + 1) * I;
+        }
+        ff[i] = point<dimensions>(tmp);
     }
 
-    return fi[0].re() * 2;
+//    for (int i = 0; i < zi.size(); i++) {
+//        std::cout << "ff[" << i << "] = " << ff[i] << std::endl;
+//    }
+//    std::cout << std::endl;
+
+    return ff[0].re();
 }
 
 template <size_t dimensions>

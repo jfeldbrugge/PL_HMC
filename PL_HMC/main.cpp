@@ -30,22 +30,30 @@ int main(int argc, const char * argv[]) {
     const double tau = 0.1;
     const double Delta_s = 0.02;
     const int N_s = 200;
-    const int N_samples = 1000000;
+    const int N_samples = 10000000;
     const double m = 2.;
-
+    
+//    point<dimensions> x, z;
+//    x = point<dimensions>({1.1});
+//    matrix<dimensions> J;
+//
+//    flow(x, z, J, tau, N_tau);
+//    force(x, tau, N_tau);
+    
+    
     matrix<dimensions> M = identity<dimensions>() * m;
     matrix<dimensions> M_inv = M.inverse(), M_Cholesky = M.Cholesky();
-    
+
     std::srand(0);
     std::default_random_engine gen;
     std::normal_distribution<double> normal(0., 1);
-    
+
     std::cout << "Picard-Lefschetz Hamiltonian Monte Carlo with " << N_samples << " samples" << std::endl;
-    
+
     //
     // Sample the points
     //
-    
+
     std::vector<point<dimensions>> xi(N_samples);
     std::cout << "Progress:"; std::cout.flush();
     point<dimensions> x;
@@ -75,16 +83,16 @@ int main(int argc, const char * argv[]) {
     std::cout << "Acceptance/Rejection rate: " << double(N_samples) / double(N_samples + reject) << "/" <<
                                                   double(reject) / double(N_samples + reject)    << std::endl;
     writeB(xi, "xi_" + std::to_string(dimensions) + ".bin");
-    
+
     //
     // Evaluate the expectation value
     //
-    
+
     std::complex<double> mean = expectation(&O, xi, tau, N_tau);
     std::complex<double> var = variance(&O, mean, xi, tau, N_tau);
 
     std::cout << "E[O(x)] = " << mean << " +/- " << std::real(std::sqrt(var)) / std::sqrt(double(N_samples)) << std::endl;
-    
+
     std::cout << "Done!" << std::endl;
     return 0;
 }
