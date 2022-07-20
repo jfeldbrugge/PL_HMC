@@ -30,7 +30,7 @@ int main(int argc, const char * argv[]) {
     const double tau = 0.1;
     const double Delta_s = 0.02;
     const int N_s = 200;
-    const int N_samples = 10000000;
+    const int N_samples = 1000000;
     const double m = 2.;
     
 //    point<dimensions> x, z;
@@ -39,7 +39,6 @@ int main(int argc, const char * argv[]) {
 //
 //    flow(x, z, J, tau, N_tau);
 //    force(x, tau, N_tau);
-    
     
     matrix<dimensions> M = identity<dimensions>() * m;
     matrix<dimensions> M_inv = M.inverse(), M_Cholesky = M.Cholesky();
