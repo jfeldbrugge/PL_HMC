@@ -6,8 +6,7 @@ jobs:
   convert_via_pandoc:
     runs-on: ubuntu-18.04
     steps:
-      - run: |
-          ls ${{ github.workspace }}
+      - run: ls
       - uses: docker://pandoc/core:2.9
         with:
           args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
