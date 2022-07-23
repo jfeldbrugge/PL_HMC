@@ -19,6 +19,7 @@ jobs:
       - name: Deploy on github pages              # Use a third-party plugin to upload the content
         uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
-          branch: main 
+          branch: main
+          folder: build 
 
 #https://epcced.github.io/2022-06-20_docker_edi-wg/e01-github-actions/index.html`
