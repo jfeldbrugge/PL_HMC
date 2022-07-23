@@ -6,9 +6,15 @@ jobs:
   convert_via_pandoc:
     runs-on: ubuntu-18.04
     steps:
-      - uses: docker://pandoc/core:2.9
+      - name: Checkout repo content               # fetch the contents of the repository
+        uses: actions/checkout@v2
+      - name: Prepare build environment
+        run: |                                    # multiple Bash commands follow
+          mkdir -p build
+          touch build/.nojekyll
+      - uses: docker://pandoc/core:2.12
         with:
-          args: "README.md -o test.txt"
+          args: "README.md -o build/test.txt"
 #          args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
 
 #https://epcced.github.io/2022-06-20_docker_edi-wg/e01-github-actions/index.html`
