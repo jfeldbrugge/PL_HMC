@@ -1,0 +1,9 @@
+makefile
+*.xcodeproj
+*.bin
+Literature
+*.svg
+.ipynb_checkpoints
+.entangled
+PL_HMC/PL_HMC
+*.nb
