@@ -16,7 +16,7 @@ jobs:
       - name: Run pandoc
         uses: docker://pandoc/core:2.12           # Always specify a version!
         with:
-          args: "index.md --css css/style.css -s --mathjax -t html5 -o build/index.html" # gets appended to pandoc command
+          args: "--css css/style.css -s --mathjax -t html5 -o build/index.html index.md" # gets appended to pandoc command
 #          args: >-                                # multi-line argument
 #            --standalone
 #            --output=build/index.html
