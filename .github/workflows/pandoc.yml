@@ -8,6 +8,7 @@ jobs:
     steps:
       - uses: docker://pandoc/core:2.9
         with:
-          args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
+          args: "README.md -o test.txt"
+#          args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
 
 #https://epcced.github.io/2022-06-20_docker_edi-wg/e01-github-actions/index.html`
