@@ -16,5 +16,10 @@ jobs:
         with:
           args: "index.md -o test.txt"
 #          args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
+      - name: Deploy on github pages              # Use a third-party plugin to upload the content
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: main
+          folder: 
 
 #https://epcced.github.io/2022-06-20_docker_edi-wg/e01-github-actions/index.html`
