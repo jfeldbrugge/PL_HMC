@@ -14,8 +14,7 @@ jobs:
           touch build/.nojekyll
       - uses: docker://pandoc/core:2.12
         with:
-          args: "index.md -o test.txt"
-#          args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
+          args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
 #      - name: Deploy on github pages              # Use a third-party plugin to upload the content
 #        uses: JamesIves/github-pages-deploy-action@4.1.0
 #        with:
