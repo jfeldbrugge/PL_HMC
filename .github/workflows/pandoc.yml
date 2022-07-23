@@ -14,7 +14,7 @@ jobs:
           touch build/.nojekyll
       - uses: docker://pandoc/core:2.12
         with:
-          args: "index.md -o build/test.txt"
+          args: "index.md -o test.txt"
 #          args: "index.md --css css/style.css -s --mathjax -t html5 -o index.html" # gets appended to pandoc command
 
 #https://epcced.github.io/2022-06-20_docker_edi-wg/e01-github-actions/index.html`
