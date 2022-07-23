@@ -18,7 +18,6 @@ jobs:
       - name: Deploy on github pages              # Use a third-party plugin to upload the content
         uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
-        with:
           branch: gh-pages
           folder: build
 
