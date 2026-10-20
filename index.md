@@ -2,11 +2,18 @@
 title: Picard-Lefschetz Hamiltonian Monte Carlo
 author: Job Leon Feldbrugge
 header-includes:
- <link rel = "icon" href = "figures/icon.png" type = "image/x-icon"> 
- <div class="topnav">
-  <a href="https://jfeldbrugge.github.io/">Home</a>
-  <a href="https://jfeldbrugge.github.io/Projects-and-Codes/">Projects and Code</a>
- </div>
+  - |
+    ```{=html}
+    <link rel="icon" href="figures/icon.png" type="image/x-icon">
+    ```
+include-before:
+  - |
+    ```{=html}
+    <div class="topnav">
+      <a href="https://jfeldbrugge.github.io/">Home</a>
+      <a href="https://jfeldbrugge.github.io/Projects-and-Codes/">Projects and Code</a>
+    </div>
+    ```
 ---
 
 We develop a Picard-Lefschetz Hamiltonian Monte Carlo following <a href="https://arxiv.org/abs/2112.10519">Fujisawa, Nishimura, Sakai, and Yosprakob (2022)</a>. The expectation value of the observable $\mathcal{O}$ with respect to the phase $e^{iS}$ with the action $S$ takes the form
