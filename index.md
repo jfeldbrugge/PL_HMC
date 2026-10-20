@@ -1,6 +1,6 @@
 ---
 title: Picard-Lefschetz Hamiltonian Monte Carlo
-author: Job Feldbrugge
+author: Job Leon Feldbrugge
 header-includes:
  <link rel = "icon" href = "figures/icon.png" type = "image/x-icon"> 
  <div class="topnav">
@@ -135,4 +135,3 @@ Find the code at:
 ```
 git clone https://github.com/jfeldbrugge/PL_HMC.git
 ```
-test
